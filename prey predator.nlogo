@@ -115,10 +115,10 @@ to-report coin-flip2?
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-837
-71
-1274
-509
+409
+40
+846
+478
 -1
 -1
 13.0
@@ -142,10 +142,10 @@ ticks
 30.0
 
 BUTTON
-695
-154
-759
-187
+267
+123
+331
+156
 setup
 setup
 NIL
@@ -159,10 +159,10 @@ NIL
 1
 
 BUTTON
-693
-226
-756
-259
+265
+195
+328
+228
 go
 go
 T
@@ -176,10 +176,10 @@ NIL
 1
 
 SLIDER
-649
-83
-821
-116
+221
+52
+393
+85
 turn
 turn
 0
@@ -191,10 +191,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-636
-314
-808
-347
+208
+283
+380
+316
 max-forward
 max-forward
 0
@@ -206,10 +206,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-640
-449
-812
-482
+212
+418
+384
+451
 num-person
 num-person
 0
@@ -221,10 +221,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-638
-395
-810
-428
+210
+364
+382
+397
 num-truck
 num-truck
 0
@@ -236,10 +236,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-641
-503
-813
-536
+213
+472
+385
+505
 num-dogs
 num-dogs
 0
@@ -249,36 +249,6 @@ num-dogs
 1
 NIL
 HORIZONTAL
-
-TEXTBOX
-497
-161
-647
-179
-Apex predators reproduce sir
-11
-0.0
-1
-
-TEXTBOX
-491
-133
-641
-151
-Trucks are apex predators sir
-11
-0.0
-1
-
-TEXTBOX
-444
-196
-661
-224
-Source: Wuhan wet market II (Backup sir)\n
-11
-0.0
-1
 
 @#$#@#$#@
 ## WHAT IS IT?
