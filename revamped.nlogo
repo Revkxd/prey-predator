@@ -186,7 +186,7 @@ num-frogs
 num-frogs
 0
 100
-100.0
+20.0
 1
 1
 NIL
@@ -201,7 +201,7 @@ num-insects
 num-insects
 0
 100
-100.0
+10.0
 1
 1
 NIL
@@ -216,7 +216,7 @@ insect-food
 insect-food
 0
 500
-439.0
+350.0
 1
 1
 NIL
@@ -231,7 +231,7 @@ max-turn
 max-turn
 0
 100
-20.0
+50.0
 1
 1
 NIL
@@ -246,7 +246,7 @@ max-forward
 max-forward
 0
 100
-52.0
+50.0
 1
 1
 NIL
@@ -261,7 +261,7 @@ flower-regrowth-time
 flower-regrowth-time
 0
 100
-13.0
+5.0
 1
 1
 NIL
