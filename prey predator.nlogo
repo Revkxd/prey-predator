@@ -1,8 +1,10 @@
-turtles-own[food-eaten]
+turtles-own[energy]
 
 to setup
+
   clear-all
   reset-ticks
+
   ask patches [
 
     ifelse (pycor = 0 ) or (pycor = 1 ) or (pycor = -1 ) and (pxcor != 11) and (pxcor != 4) and (pxcor != -4) and (pxcor != -11)
@@ -37,11 +39,15 @@ end
 
 
 to go
+
  ;; if all? patches [pcolor = black][stop]
     ask turtles with [shape = "truck"][
     ifelse coin-flip? [right random turn] [left random turn]
 
-    if any? turtles-here with [shape = "person"]
+
+
+
+    ifelse any? turtles-here with [shape = "person"] and energy < 10
     [
       hatch 1 [
         set size 3
@@ -49,9 +55,17 @@ to go
         set color gray
       ]
 
+    set energy 0
     ;if ticks mod 30 = 0
     ;[die]
     ]
+
+    [
+      set energy energy + 1
+    ]
+
+    if energy = 10
+    [die]
 
     forward random max-forward
     let dogs-in-playground count turtles with [ shape = "truck"]    ;out puts the numeber of truck
@@ -160,12 +174,12 @@ NIL
 
 BUTTON
 265
-195
+194
 328
-228
+227
 go
 go
-T
+NIL
 1
 T
 OBSERVER
@@ -214,7 +228,7 @@ num-person
 num-person
 0
 100
-9.0
+36.0
 1
 1
 NIL
