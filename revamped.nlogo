@@ -1,122 +1,66 @@
-turtles-own[energy]
+turtles-own [ energy ]
+patches-own [ countdown ]
+breed [insects insect]
+breed [frogs frog]
+
 
 to setup
-
   clear-all
   reset-ticks
-
-  ask patches [
-
-    ifelse (pycor = 0 ) or (pycor = 1 ) or (pycor = -1 ) and (pxcor != 11) and (pxcor != 4) and (pxcor != -4) and (pxcor != -11)
-    [ set pcolor yellow ]
-    [ set pcolor black ]
-
-
+  create-frogs num-frogs[
+    set shape "frog"
+    set size 3
+    setxy random-xcor random-ycor
+    set energy max-energy
   ]
 
-  create-turtles num-truck[
-  set shape "truck"
-  set size 3
-  set color gray
-  setxy random-xcor random-ycor
+  create-insects num-insects[
+    set shape "bug"
+    set size 2
+    set color black
+    setxy random-xcor random ycor
+    set energy max-energy
   ]
 
-  create-turtles num-person[
-  set shape "person"
-  set size 2
-  set color orange
-  setxy random-xcor random-ycor
+  ask patches[
+    set pcolor blue
   ]
 
-  create-turtles num-dogs[
-  set shape "dog"
-  set size 1
-  set color blue
-  setxy random-xcor random-ycor
+  ask n-of insect-food patches[
+    set pcolor yellow
   ]
-
 end
 
-
 to go
+  if not any? frogs [stop]
+  if not any? insects [stop]
 
- ;; if all? patches [pcolor = black][stop]
-    ask turtles with [shape = "truck"][
-    ifelse coin-flip? [right random turn] [left random turn]
+  ask turtles with [shape = "bug"][
+    ifelse coin-flip? [right random max-turn] [left random max-turn]
+    forward random max-forward * 1.2
 
-
-
-
-    ifelse any? turtles-here with [shape = "person"] and energy < 10
-    [
-      hatch 1 [
-        set size 3
-        set shape "truck"
-        set color gray
-      ]
-
-    set energy 0
-    ;if ticks mod 30 = 0
-    ;[die]
+    ifelse pcolor = yellow[
+      set pcolor brown
+      set energy max-energy
     ]
+    [set energy energy - 1]
+    if energy <= 0 [die]
 
-    [
-      set energy energy + 1
-    ]
-
-    if energy = 10
-    [die]
-
-    forward random max-forward
-    let dogs-in-playground count turtles with [ shape = "truck"]    ;out puts the numeber of truck
-    output-show dogs-in-playground
+    reproduce-insects
   ]
 
-  ask turtles with [shape = "person"][
-
-    ifelse coin-flip? [right random turn] [left random turn]
-
-    if any? turtles-here with [shape = "dog"]
-    [
-      hatch 1 [
-        set size 2
-        set shape "person"
-        set color orange
-      ]
-    ]
-
-   if any? turtles-here with [shape = "truck"]
-   [die]
-
-   ;if ticks mod 30 = 0
-   ;[die]
-
-    ;let dogs-in-playground count turtles with [ shape = "person"]    ;out puts the numeber of humans
-    ;output-show dogs-in-playground
-
+  ask turtles with [shape = "frog"][
+    ifelse coin-flip? [right random max-turn] [left random max-turn]
     forward random max-forward
+
+    eat-insect
+    set energy energy - 1
+    if energy <= 3 [die]
+
+    reproduce-frogs
   ]
 
-ask turtles with [shape = "dog"][
-    ifelse coin-flip? [right random turn] [left random turn]
-    if pcolor = black or pcolor = yellow and coin-flip2?
-    [
-      hatch 1 [
-        set size 1
-        set shape "dog"
-        set color blue
-      ]
-    ]
-
-    if any? turtles-here with [shape = "person"]
-    [die]
-
-    ;let dogs-in-playground count turtles with [ shape = "dog"]    ;out puts the numeber of dog
-    ;output-show dogs-in-playground
-
-
-    forward random max-forward
-    ]
+  ask patches [regen-flower]
   tick
 end
 
@@ -127,15 +71,58 @@ end
 to-report coin-flip2?
   report random 75 = 0
 end
+
+to regen-flower
+  if pcolor = brown [
+    ifelse countdown <= 0
+      [ set pcolor yellow
+        set countdown flower-regrowth-time ]
+      [ set countdown countdown - 1 ]
+  ]
+end
+
+to eat-insect
+  let prey one-of insects-here
+  if prey != nobody[
+    ask prey [ die ]
+    set energy energy + (max-energy * 0.05)
+  ]
+end
+
+to reproduce-frogs
+  if random-float 1 > 0.4 and energy >= max-energy * 0.5[
+    set energy max-energy * 0.40
+    hatch 1 [rt random-float 360 fd 1]
+  ]
+end
+
+to reproduce-insects
+  if random-float 1 > 0.4 and energy >= max-energy * 0.1[
+    set energy energy - 10
+    hatch 1 [rt random-float 360 fd 1]
+  ]
+end
+
+to-report preds
+  report turtles with [shape = "frog"]
+end
+
+to-report preys
+  report turtles with [shape = "bug"]
+end
+
+to-report food
+  report patches with [pcolor = yellow]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
-409
-40
-846
-478
+348
+10
+1007
+670
 -1
 -1
-13.0
+13.303030303030303
 1
 10
 1
@@ -145,10 +132,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--16
-16
--16
-16
+-24
+24
+-24
+24
 0
 0
 1
@@ -156,10 +143,10 @@ ticks
 30.0
 
 BUTTON
-267
-123
-331
-156
+196
+45
+259
+78
 setup
 setup
 NIL
@@ -173,10 +160,10 @@ NIL
 1
 
 BUTTON
-265
 194
-328
-227
+95
+257
+128
 go
 go
 T
@@ -190,27 +177,87 @@ NIL
 1
 
 SLIDER
-221
-52
-393
-85
-turn
-turn
+145
+246
+317
+279
+num-frogs
+num-frogs
 0
 100
-60.0
+100.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-208
-283
-380
+144
+305
 316
+338
+num-insects
+num-insects
+0
+100
+100.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+143
+361
+315
+394
+insect-food
+insect-food
+0
+500
+439.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+143
+410
+315
+443
+max-turn
+max-turn
+0
+100
+20.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+142
+459
+314
+492
 max-forward
 max-forward
+0
+100
+52.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+146
+199
+318
+232
+flower-regrowth-time
+flower-regrowth-time
 0
 100
 13.0
@@ -220,49 +267,71 @@ NIL
 HORIZONTAL
 
 SLIDER
-212
-418
-384
-451
-num-person
-num-person
+146
+156
+318
+189
+max-energy
+max-energy
 0
-100
-17.0
-1
+150
+50.0
+50
 1
 NIL
 HORIZONTAL
 
-SLIDER
-210
-364
-382
-397
-num-truck
-num-truck
-0
-100
-6.0
-1
-1
-NIL
-HORIZONTAL
+PLOT
+1027
+61
+1484
+423
+Scoreboard
+Time
+Population
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"frogs" 1.0 0 -13840069 true "" "plot count frogs"
+"insects" 1.0 0 -16777216 true "" "plot count insects"
 
-SLIDER
-213
-472
-385
-505
-num-dogs
-num-dogs
-0
-200
-24.0
+MONITOR
+1315
+471
+1496
+516
+Food count
+food
+17
 1
+11
+
+MONITOR
+1104
+473
+1287
+518
+Frogs
+preds
+17
 1
-NIL
-HORIZONTAL
+11
+
+MONITOR
+1104
+535
+1286
+580
+Insects
+preys
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -380,22 +449,6 @@ false
 0
 Circle -7500403 true true 0 0 300
 
-dog
-false
-0
-Polygon -7500403 true true 300 165 300 195 270 210 183 204 180 240 165 270 165 300 120 300 0 240 45 165 75 90 75 45 105 15 135 45 165 45 180 15 225 15 255 30 225 30 210 60 225 90 225 105
-Polygon -16777216 true false 0 240 120 300 165 300 165 285 120 285 10 221
-Line -16777216 false 210 60 180 45
-Line -16777216 false 90 45 90 90
-Line -16777216 false 90 90 105 105
-Line -16777216 false 105 105 135 60
-Line -16777216 false 90 45 135 60
-Line -16777216 false 135 60 135 45
-Line -16777216 false 181 203 151 203
-Line -16777216 false 150 201 105 171
-Circle -16777216 true false 171 88 34
-Circle -16777216 false false 261 162 30
-
 dot
 false
 0
@@ -459,6 +512,17 @@ Circle -16777216 true false 113 68 74
 Polygon -10899396 true false 189 233 219 188 249 173 279 188 234 218
 Polygon -10899396 true false 180 255 150 210 105 210 75 240 135 240
 
+frog
+true
+0
+Polygon -13840069 true false 146 18 135 30 119 42 105 90 90 150 105 195 135 225 165 225 195 195 210 150 195 90 180 41 165 30 155 18
+Polygon -13840069 true false 91 176 67 148 70 121 66 119 61 133 59 111 53 111 52 131 47 115 42 120 46 146 55 187 80 237 106 269 116 268 114 214 131 222
+Polygon -13840069 true false 185 62 234 84 223 51 226 48 234 61 235 38 240 38 243 60 252 46 255 49 244 95 188 92
+Polygon -13840069 true false 115 62 66 84 77 51 74 48 66 61 65 38 60 38 57 60 48 46 45 49 56 95 112 92
+Polygon -13840069 true false 200 186 233 148 230 121 234 119 239 133 241 111 247 111 248 131 253 115 258 120 254 146 245 187 220 237 194 269 184 268 186 214 169 222
+Circle -16777216 true false 157 38 18
+Circle -16777216 true false 125 38 18
+
 house
 false
 0
@@ -482,15 +546,6 @@ line half
 true
 0
 Line -7500403 true 150 0 150 150
-
-meat
-true
-0
-Polygon -1 true false 270 60 180 135 150 120 255 45
-Circle -2674135 true false 44 59 152
-Circle -2674135 false false 108 78 85
-Polygon -1 true false 135 180 45 255 15 240 120 165
-Polygon -2674135 true false 45 135 30 165 30 195 45 210 60 225 90 240 135 255 195 240 210 225 210 210 255 180 255 135 240 120 240 105 240 75 210 60 195 60 180 60 180 60 165 45 150 45 105 60 90 90 60 120 60 150 60 150 90 105
 
 pentagon
 false
@@ -517,24 +572,6 @@ Polygon -7500403 true true 165 180 165 210 225 180 255 120 210 135
 Polygon -7500403 true true 135 105 90 60 45 45 75 105 135 135
 Polygon -7500403 true true 165 105 165 135 225 105 255 45 210 60
 Polygon -7500403 true true 135 90 120 45 150 15 180 45 165 90
-
-rabbit
-false
-0
-Polygon -7500403 true true 61 150 76 180 91 195 103 214 91 240 76 255 61 270 76 270 106 255 132 209 151 210 181 210 211 240 196 255 181 255 166 247 151 255 166 270 211 270 241 255 240 210 270 225 285 165 256 135 226 105 166 90 91 105
-Polygon -7500403 true true 75 164 94 104 70 82 45 89 19 104 4 149 19 164 37 162 59 153
-Polygon -7500403 true true 64 98 96 87 138 26 130 15 97 36 54 86
-Polygon -7500403 true true 49 89 57 47 78 4 89 20 70 88
-Circle -16777216 true false 37 103 16
-Line -16777216 false 44 150 104 150
-Line -16777216 false 39 158 84 175
-Line -16777216 false 29 159 57 195
-Polygon -5825686 true false 0 150 15 165 15 150
-Polygon -5825686 true false 76 90 97 47 130 32
-Line -16777216 false 180 210 165 180
-Line -16777216 false 165 180 180 165
-Line -16777216 false 180 165 225 165
-Line -16777216 false 180 210 210 240
 
 sheep
 false
