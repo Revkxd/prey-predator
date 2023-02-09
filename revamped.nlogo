@@ -34,6 +34,7 @@ end
 to go
   if not any? frogs [stop]
   if not any? insects [stop]
+  if not any? patches with [pcolor = yellow] [stop]
 
   ask turtles with [shape = "bug"][
     ifelse coin-flip? [right random max-turn] [left random max-turn]
